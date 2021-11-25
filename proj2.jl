@@ -21,7 +21,7 @@ print("--------------------------------------\n")
 #-------------------------------------------------------------------- EXERCISE 3
 V = [1;2;3] #vector to be rotated
 a = 90 #degrees
-z = [1;0;0] #axis z
+z = [0;0;1] #axis z
 
 function rotate_phi_z(a, z, V)
     #formula de Rodriges to find "R", the rotation matrix
