@@ -22,17 +22,16 @@ function to_2d(V3)
 
     V2 = M*V3 #operation to transform V3 of R3 in V2 in R2
 
-    print("The vector ", V3, " representated in R2 is: ", V2)
-    println()
-end
+    # print("The vector ", V3, " representated in R2 is: ", V2)
+    # println()
 
-to_2d(V3)
+    return V2
+end
 
 print("--------------------------------------\n")
 
 #-------------------------------------------------------------------- EXERCISE 3
-V = [1;1;1] #vector to be rotated
-phi = 90 #degrees
+angle = 90 #degrees
 z = [0;0;1] #axis z
 
 function rotate_phi_z(phi, z, V)
@@ -51,12 +50,11 @@ function rotate_phi_z(phi, z, V)
     if (R*R'==I && det(R)==1)
         #we find the rotated matrix:
         U = R*V
-        print("V rotated is = ", U)
-        println()
+        # print("V rotated is = ", U)
+        # println()
+        return U
     else
         print("R = ", R, " is NOT a rotation matrix\n")
 
     end
 end
-
-rotate_phi_z(phi, z, V)

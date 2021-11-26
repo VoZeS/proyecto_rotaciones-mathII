@@ -3,7 +3,6 @@ using Gtk, Graphics, Logging, Printf
 
 include("proj2.jl")
 
-
 # the main window
 win = GtkWindow("SO(3)")
 
@@ -33,7 +32,7 @@ the_canvas = init_canvas(500,500)
 msg_label = GtkLabel("No message at this time")
 
 # defaults
-default_value = Dict("phi" => 10, "v_x" => 1, "v_y" => 0, "v_z" => 0, "alpha" => 70)
+default_value = Dict("phi" => 0, "v_x" => 1, "v_y" => 0, "v_z" => 0, "alpha" => 70)
 
 # an array to store the entry boxes
 entry_list = []
@@ -79,14 +78,23 @@ function normalize_phi()
     output_normalized("phi_normalized", read_original_box("phi"))
 end
 
-
 function entry_box_callback(widget)
     # who called us?
     name = get_gtk_property(widget, :name, String)
     text = get_gtk_property(widget, :text, String)
 
-    # trumpet this out to the world
-    GAccessor.text(msg_label, name * " changed to " * text)
+    # checking that we tell user alpha has limits at 0 and 180
+    if (get_gtk_property(widget, :name, String) == "alpha" && read_original_box("alpha") < 0)
+
+        GAccessor.text(msg_label, "alpha" * " changed to 0")
+
+    elseif (get_gtk_property(widget, :name, String) == "alpha" && read_original_box("alpha") > 180)
+        GAccessor.text(msg_label, "alpha" * " changed to 180" )
+
+    else
+        GAccessor.text(msg_label, name * " changed to " * text)
+    end
+
 
     # change the correct normalized output
     if name[1] == 'v'
@@ -228,11 +236,12 @@ function draw_the_canvas(canvas)
     fill(ctx)
 
     # Paint an example line
-    set_line_width(ctx, 10)
-    set_source_rgb(ctx, 1, 0, 1)
-    move_to(ctx, 10, 10)
-    line_to(ctx, 100, 50)
-    stroke(ctx)
+    # set_line_width(ctx, 5)
+    # set_source_rgb(ctx, 1, 0, 1)
+    # move_to(ctx, 10, 10)
+    # line_to(ctx, 100, 50)
+    # stroke(ctx)
+
 
     # read some normalized boxes and draw a line
     phi = 5  * read_normalized_label("phi_normalized")
@@ -240,10 +249,78 @@ function draw_the_canvas(canvas)
     v_y = 50 * read_normalized_label("v_y_normalized")
     v_z = 50 * read_normalized_label("v_z_normalized")
 
-    set_line_width(ctx, 5)
-    set_source_rgb(ctx, 1, 1, 0)
-    move_to(ctx, phi, v_x)
-    line_to(ctx, v_y, v_z)
+    alpha = read_original_box("alpha")
+
+    if(alpha <= 0)
+        alpha = 0
+    end
+
+    if(alpha >= 180)
+        alpha = 180
+    end
+
+    #AXIS R3
+    X = [1;0;0]
+    Y = [0;1;0]
+    Z = [0;0;1]
+
+    v = [v_x; v_y; v_z]
+
+    #WE ROTATE AXIS IN R3
+    Xr = rotate_phi_z(phi, z, X)
+    Yr = rotate_phi_z(phi, z, Y)
+    Zr = rotate_phi_z(phi, z, Z)
+
+    vr = rotate_phi_z(phi, z, v)
+
+    #WE PROJECT THE ROTATED AXIS IN R3 TO R2
+    Xr2 = to_2d(Xr)
+    Yr2 = to_2d(Yr)
+    Zr2 = to_2d(Zr)
+
+    vr2 = to_2d(vr)
+
+    #DRAW X AXIS (RED)
+    set_line_width(ctx, 2)
+    set_source_rgb(ctx, 1, 0, 0)
+    move_to(ctx, 200, 200)
+    line_to(ctx, 200 + Xr2[1]*100, 200 - Xr2[2]*100)
+    stroke(ctx)
+
+    #circle at the end of the axis
+    circle(ctx, 200 + Xr2[1]*100, 200 - Xr2[2]*100, 5)
+    set_source_rgb(ctx, 1, 0, 0)
+    fill(ctx)
+
+    #DRAW Y AXIS (GREEN)
+    set_line_width(ctx, 2)
+    set_source_rgb(ctx, 0, 1, 0)
+    move_to(ctx, 200, 200)
+    line_to(ctx, 200 + Yr2[1]*100, 200 - Yr2[2]*100)
+    stroke(ctx)
+
+    #circle at the end of the axis
+    circle(ctx, 200 + Yr2[1]*100, 200 - Yr2[2]*100, 5)
+    set_source_rgb(ctx, 0, 1, 0)
+    fill(ctx)
+
+    #DRAW Z AXIS (BLUE)
+    set_line_width(ctx, 2)
+    set_source_rgb(ctx, 0, 0, 1)
+    move_to(ctx, 200, 200)
+    line_to(ctx, 200 + Zr2[1]*100, 200 - Zr2[2]*100)
+    stroke(ctx)
+
+    #circles at the end of the axis
+    circle(ctx, 200 + Zr2[1]*100, 200 - Zr2[2]*100, 5)
+    set_source_rgb(ctx, 0, 0, 1)
+    fill(ctx)
+
+    #DRAW VECTOR (BLACK)
+    set_line_width(ctx, 2)
+    set_source_rgb(ctx, 0, 0, 0)
+    move_to(ctx, 200, 200)
+    line_to(ctx, 200 + vr2[1]*alpha, 200 - vr2[2]*alpha)
     stroke(ctx)
 
 end
