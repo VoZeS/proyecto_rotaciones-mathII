@@ -1,6 +1,9 @@
 # the packages we need
 using Gtk, Graphics, Logging, Printf
 
+include("proj2.jl")
+
+
 # the main window
 win = GtkWindow("SO(3)")
 
@@ -244,7 +247,6 @@ function draw_the_canvas(canvas)
     stroke(ctx)
 
 end
-
 
 # -------- initialize everything ---------
 

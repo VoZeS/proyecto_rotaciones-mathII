@@ -52,6 +52,7 @@ function rotate_phi_z(phi, z, V)
         #we find the rotated matrix:
         U = R*V
         print("V rotated is = ", U)
+        println()
     else
         print("R = ", R, " is NOT a rotation matrix\n")
 
