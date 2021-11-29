@@ -9,10 +9,10 @@ V3 = [0; 0; 1] #vector of R3 we want to project in R2
 function to_2d(V3)
     #we calculate de matrix (see the first exercise)
 
-    a = 0.5*cos(42 * pi/180)
-    b = 0.5*sin(42 * pi/180)
-    c = cos(7 * pi/180)
-    d = sin(7 * pi/180)
+    a = 0.5*cosd(42)
+    b = 0.5*sind(42)
+    c = cosd(7)
+    d = sind(7)
     e = 0
     f = 1
 
@@ -57,7 +57,7 @@ function rotate_phi_z(phi, z, V)
 end
 
 #-------------------------------------------------------------------- EXERCISE 3.1
-angle = 90 #degrees
+#=angle = 90 #degrees
 axis = [0;0;1] #axis z
 
 function axis_angle_to_mat(axis, angle)
@@ -99,7 +99,7 @@ mat = axis_angle_to_mat(axis, angle)
 
 mat_to_axis_angle(mat)
 
-#=q = quat(1,0,0,0)
+q = quat(1,0,0,0)
 
 function quat_to_mat(q)
     mat = [((q.s)^2 + (q.v1)^2 - (q.v2)^2 - (q.v3)^2) (2*(q.v1)*(q.v2) - 2*(q.s)*(q.v3)) (2*(q.v1)*(q.v3) + 2*(q.s)*(q.v2));

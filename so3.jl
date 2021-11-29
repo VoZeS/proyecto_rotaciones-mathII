@@ -65,9 +65,11 @@ function normalize_v()
 
     norm = sqrt(v_x*v_x + v_y*v_y + v_z*v_z)
 
-    output_normalized("v_x_normalized", v_x / norm)
-    output_normalized("v_y_normalized", v_y / norm)
-    output_normalized("v_z_normalized", v_z / norm)
+    if(norm!=0)
+        output_normalized("v_x_normalized", v_x / norm)
+        output_normalized("v_y_normalized", v_y / norm)
+        output_normalized("v_z_normalized", v_z / norm)
+    end
 end
 
 function normalize_alpha()
@@ -249,7 +251,7 @@ function draw_the_canvas(canvas)
     v_y = 50 * read_normalized_label("v_y_normalized")
     v_z = 50 * read_normalized_label("v_z_normalized")
 
-    alpha = read_original_box("alpha")
+    alpha = read_original_box("alpha") * 0.05
 
     if(alpha <= 0)
         alpha = 0
@@ -283,45 +285,50 @@ function draw_the_canvas(canvas)
     #DRAW X AXIS (RED)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 1, 0, 0)
-    move_to(ctx, 200, 200)
-    line_to(ctx, 200 + Xr2[1]*100, 200 - Xr2[2]*100)
+    move_to(ctx, 250, 250)
+    line_to(ctx, 250 + Xr2[1]*100, 250 - Xr2[2]*100)
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 200 + Xr2[1]*100, 200 - Xr2[2]*100, 5)
+    circle(ctx, 250 + Xr2[1]*100, 250 - Xr2[2]*100, 5)
     set_source_rgb(ctx, 1, 0, 0)
     fill(ctx)
 
     #DRAW Y AXIS (GREEN)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 1, 0)
-    move_to(ctx, 200, 200)
-    line_to(ctx, 200 + Yr2[1]*100, 200 - Yr2[2]*100)
+    move_to(ctx, 250, 250)
+    line_to(ctx, 250 + Yr2[1]*100, 250 - Yr2[2]*100)
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 200 + Yr2[1]*100, 200 - Yr2[2]*100, 5)
+    circle(ctx, 250 + Yr2[1]*100, 250 - Yr2[2]*100, 5)
     set_source_rgb(ctx, 0, 1, 0)
     fill(ctx)
 
     #DRAW Z AXIS (BLUE)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 0, 1)
-    move_to(ctx, 200, 200)
-    line_to(ctx, 200 + Zr2[1]*100, 200 - Zr2[2]*100)
+    move_to(ctx, 250, 250)
+    line_to(ctx, 250 + Zr2[1]*100, 250 - Zr2[2]*100)
     stroke(ctx)
 
     #circles at the end of the axis
-    circle(ctx, 200 + Zr2[1]*100, 200 - Zr2[2]*100, 5)
+    circle(ctx, 250 + Zr2[1]*100, 250 - Zr2[2]*100, 5)
     set_source_rgb(ctx, 0, 0, 1)
     fill(ctx)
 
     #DRAW VECTOR (BLACK)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 0, 0)
-    move_to(ctx, 200, 200)
-    line_to(ctx, 200 + vr2[1]*alpha, 200 - vr2[2]*alpha)
+    move_to(ctx, 250, 250)
+    line_to(ctx, 250 + vr2[1]*alpha, 250 - vr2[2]*alpha)
     stroke(ctx)
+
+    #circles at the end of the axis
+    circle(ctx, 250 + vr2[1]*alpha, 250 - vr2[2]*alpha, 3)
+    set_source_rgb(ctx, 0, 0, 0)
+    fill(ctx)
 
 end
 
