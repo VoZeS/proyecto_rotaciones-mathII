@@ -30,17 +30,19 @@ end
 
 #-------------------------------------------------------------------- EXERCISE 2.3
 function rotate_phi_z(phi, z, V)
-    Z = [0 -z[3,1] z[2,1];
-         z[3,1] 0 -z[1,1];
-        -z[2,1] z[1,1] 0]
+    Z = [0 -z[3] z[2];
+         z[3] 0 -z[1];
+        -z[2] z[1] 0]
 
     #formula de Rodriges to find "R", the rotation matrix
-    R = I + Z*sin(phi*pi/180) + Z^2*(1-cos(phi*pi/180))
+    R = I + sind(phi)*Z + (1-cosd(phi))*(Z^2)
     #just above, we multiply pi/180 to the angle (in degrees) to obtain the angle in radians
     #so julia can do the operation we want
 
     #next, we will check if R is a rotation matrix: R*R'=I and det(R)=1
-    if (R*R'==I && det(R)==1)
+    #For this comprobation, we needed to round R*R' and det(R). That's because much times
+    #the result was 0.999999 and not 1
+    if (round.(R*R') == I && round(det(R)) == 1)
         #we find the rotated matrix:
         U = R*V
         # print("V rotated is = ", U)
@@ -48,6 +50,8 @@ function rotate_phi_z(phi, z, V)
         return U
     else
         print("R = ", R, "\nis NOT a rotation matrix\n")
+        println("R*R'= ", round.(R*R'))
+        println("det(R)= ", round(det(R)))
 
     end
 end
@@ -62,16 +66,20 @@ function axis_angle_to_mat(axis, angle)
         -axis[2,1] axis[1,1] 0]
 
     #formula Rodrigues
-    R = I + Z*sin(angle*pi/180) + Z^2*(1-cos(angle*pi/180))
+    R = I + sind(angle)*Z + (1-cosd(angle))*(Z^2)
     #just above, we multiply pi/180 to the angle (in degrees) to obtain the angle in radians
     #so julia can do the operation we want
 
     #next, we will check if R is a rotation matrix: R*R'=I and det(R)=1
-    if (R*R'== I && det(R)==1)
+    #For this comprobation, we needed to round R*R' and det(R). That's because much times
+    #the result was 0.999999 and not 1
+    if (round.(R*R')== I && round(det(R))==1)
         #we return the rotation matrix
         return R
     else
         print("R = ", R, "\nis NOT a rotation matrix\n")
+        println("R*R'= ", round.(R*R'))
+        println("det(R)= ", round(det(R)))
     end
 end
 
@@ -91,7 +99,7 @@ mat = axis_angle_to_mat(axis, angle)
 
 mat_to_axis_angle(mat)
 
-q = quat(1,0,0,0)
+#=q = quat(1,0,0,0)
 
 function quat_to_mat(q)
     mat = [((q.s)^2 + (q.v1)^2 - (q.v2)^2 - (q.v3)^2) (2*(q.v1)*(q.v2) - 2*(q.s)*(q.v3)) (2*(q.v1)*(q.v3) + 2*(q.s)*(q.v2));
@@ -113,4 +121,4 @@ end
 
 function axis_angle_to_quat(axis, angle)
 
-end 
+end=#

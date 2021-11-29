@@ -226,14 +226,14 @@ function draw_the_canvas(canvas)
     fill(ctx)
 
     # Paint red rectangle
-    rectangle(ctx, 3w/4, 0, w/4, h/4)
-    set_source_rgb(ctx, 1, 0, 0)
-    fill(ctx)
+    # rectangle(ctx, 3w/4, 0, w/4, h/4)
+    # set_source_rgb(ctx, 1, 0, 0)
+    # fill(ctx)
 
     # Paint blue rectangle
-    rectangle(ctx, 0, 3h/4, w/4, h/4)
-    set_source_rgb(ctx, 0, 0, 1)
-    fill(ctx)
+    # rectangle(ctx, 0, 3h/4, w/4, h/4)
+    # set_source_rgb(ctx, 0, 0, 1)
+    # fill(ctx)
 
     # Paint an example line
     # set_line_width(ctx, 5)
@@ -267,11 +267,11 @@ function draw_the_canvas(canvas)
     v = [v_x; v_y; v_z]
 
     #WE ROTATE AXIS IN R3
-    Xr = rotate_phi_z(phi, z, X)
-    Yr = rotate_phi_z(phi, z, Y)
-    Zr = rotate_phi_z(phi, z, Z)
+    Xr = rotate_phi_z(phi, Z, X)
+    Yr = rotate_phi_z(phi, Z, Y)
+    Zr = rotate_phi_z(phi, Z, Z)
 
-    vr = rotate_phi_z(phi, z, v)
+    vr = rotate_phi_z(phi, Z, v)
 
     #WE PROJECT THE ROTATED AXIS IN R3 TO R2
     Xr2 = to_2d(Xr)
