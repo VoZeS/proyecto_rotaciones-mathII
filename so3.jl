@@ -69,7 +69,13 @@ function normalize_v()
         output_normalized("v_x_normalized", v_x / norm)
         output_normalized("v_y_normalized", v_y / norm)
         output_normalized("v_z_normalized", v_z / norm)
+    else
+        output_normalized("v_x_normalized", 0)
+        output_normalized("v_y_normalized", 0)
+        output_normalized("v_z_normalized", 0)
     end
+
+
 end
 
 function normalize_alpha()
