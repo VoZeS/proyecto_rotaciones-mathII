@@ -1,6 +1,7 @@
 using Printf
 using LinearAlgebra
 using DelimitedFiles
+using Quaternions
 
 #-------------------------------------------------------------------- EXERCISE 2.2
 
@@ -55,70 +56,3 @@ function rotate_phi_z(phi, z, V)
 
     end
 end
-
-#-------------------------------------------------------------------- EXERCISE 3.1
-#=angle = 90 #degrees
-axis = [0;0;1] #axis z
-
-function axis_angle_to_mat(axis, angle)
-    Z = [0 -axis[3,1] axis[2,1];
-         axis[3,1] 0 -axis[1,1];
-        -axis[2,1] axis[1,1] 0]
-
-    #formula Rodrigues
-    R = I + sind(angle)*Z + (1-cosd(angle))*(Z^2)
-    #just above, we multiply pi/180 to the angle (in degrees) to obtain the angle in radians
-    #so julia can do the operation we want
-
-    #next, we will check if R is a rotation matrix: R*R'=I and det(R)=1
-    #For this comprobation, we needed to round R*R' and det(R). That's because much times
-    #the result was 0.999999 and not 1
-    if (round.(R*R')== I && round(det(R))==1)
-        #we return the rotation matrix
-        return R
-    else
-        print("R = ", R, "\nis NOT a rotation matrix\n")
-        println("R*R'= ", round.(R*R'))
-        println("det(R)= ", round(det(R)))
-    end
-end
-
-function mat_to_axis_angle(mat)
-    #first, we find the angle:
-    angle = acos((tr(mat)-1)/2)
-
-    #then, we find the axis:
-    V = (mat-mat')/(2*sin(angle))
-    v = [V[3,2]; V[1,3]; V[2,1]]
-
-    #we return the angle in degrees
-    return angle*(180/pi), v
-end
-
-mat = axis_angle_to_mat(axis, angle)
-
-mat_to_axis_angle(mat)
-
-q = quat(1,0,0,0)
-
-function quat_to_mat(q)
-    mat = [((q.s)^2 + (q.v1)^2 - (q.v2)^2 - (q.v3)^2) (2*(q.v1)*(q.v2) - 2*(q.s)*(q.v3)) (2*(q.v1)*(q.v3) + 2*(q.s)*(q.v2));
-            (2*(q.v1)*(q.v2) + 2*(q.s)*(q.v3)) ((q.s)^2 - (q.v1)^2 + (q.v2)^2 - (q.v3)^2) (2*(q.v2)*(q.v3) - 2*(q.s)*(q.v1));
-            (2*(q.v1)*(q.v3) - 2*(q.s)*(q.v2)) (2*(q.v2)*(q.v3) + 2*(q.s)*(q.v1)) ((q.s)^2 - (q.v1)^2 - (q.v2)^2 + (q.v3)^2)]
-
-    return mat
-end
-
-quat_to_mat(q)
-
-function mat_to_quat(mat)
-
-end
-
-function quat_to_axis_angle(quat)
-
-end
-
-function axis_angle_to_quat(axis, angle)
-
-end=#
