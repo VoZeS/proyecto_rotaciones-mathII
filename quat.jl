@@ -4,8 +4,8 @@ using DelimitedFiles
 using Quaternions
 
 #-------------------------------------------------------------------- EXERCISE 3.1
-#angle = 90 #degrees
-#axis = [0;1;2] #axis z
+angle_input = 90 #degrees
+axis_input = [0;1;2] #axis z
 global axis_norm
 
 
@@ -38,7 +38,7 @@ function axis_angle_to_mat(axis, angle)
     end
 end
 
-mat = axis_angle_to_mat([0;1;2], 90)
+mat = axis_angle_to_mat(axis_input, angle_input)
 
 println("The rotation matrix composed of AXIS = ", axis,
  " normalized as ", axis_norm, " and ANGLE = ", angle,
@@ -79,7 +79,7 @@ end
 println()
 println("The Quaternion composed of AXIS = ", axis,
  " normalized as ", axis_norm, " and ANGLE = ", angle,
-  " degrees is q = ", axis_angle_to_quat(axis_norm, angle))
+  " degrees is q = ", axis_angle_to_quat(axis_norm, angle_input))
 
 function quat_to_axis_angle(q3)
     angle3 = 2*acosd(q3.s);
@@ -122,7 +122,7 @@ function mat_to_quat(mat)
 
         return q3
     else
-        return "THIS ROTATION MATRIX [IDENTITY MATRIX] HAS NO AXIS. ITS ROTATION ANGLE IS 0 [OR 360]."
+        return "THIS ROTATION MATRIX [IDENTITY MATRIX] HAS NO AXIS. ITS ROTATION ANGLE IS 0 + 360*K [BEING K AN ENTER]. FOR THE RESULT THIS MATRIX HAS NO QUATERNION FORM."
     end
 
 end
