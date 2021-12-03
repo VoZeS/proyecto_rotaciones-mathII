@@ -3,6 +3,7 @@ using LinearAlgebra
 using DelimitedFiles
 using Quaternions
 
+#EXERCISE MADE BY ERIK MARTÍN GRAZÓN & DAVID BOCES OBIS
 #-------------------------------------------------------------------- EXERCISE 3.1
 angle_input = 90 #degrees
 axis_input = [0;1;2] #axis z
