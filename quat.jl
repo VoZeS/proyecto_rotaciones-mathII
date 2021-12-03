@@ -4,16 +4,18 @@ using DelimitedFiles
 using Quaternions
 
 #-------------------------------------------------------------------- EXERCISE 3.1
-angle = 90 #degrees
-axis = [0;1;2] #axis z
+#angle = 90 #degrees
+#axis = [0;1;2] #axis z
 global axis_norm
 
-#first, we normalize the axis
-modul = sqrt(axis[1]*axis[1] + axis[2]*axis[2] + axis[3]*axis[3])
 
-global axis_norm = axis/modul
 
-function axis_angle_to_mat(axis_norm, angle)
+function axis_angle_to_mat(axis, angle)
+    #first, we normalize the axis
+    modul = sqrt(axis[1]*axis[1] + axis[2]*axis[2] + axis[3]*axis[3])
+
+    global axis_norm = axis/modul
+
     Z = [0 -axis_norm[3] axis_norm[2];
          axis_norm[3] 0 -axis_norm[1];
         -axis_norm[2] axis_norm[1] 0]
@@ -36,7 +38,8 @@ function axis_angle_to_mat(axis_norm, angle)
     end
 end
 
-mat = axis_angle_to_mat(axis_norm, angle)
+mat = axis_angle_to_mat([0;1;2], 90)
+
 println("The rotation matrix composed of AXIS = ", axis,
  " normalized as ", axis_norm, " and ANGLE = ", angle,
   " degrees is R = ", mat)
@@ -58,10 +61,16 @@ println("The rotation matrix R = ", mat,
 " has the following ANGLE (in degrees) and unit AXIS: \n", mat_to_axis_angle(mat))
 
 q = quat(1,0,0,0)
+
 global q2
 
-function axis_angle_to_quat(axis_norm, angle)
+function axis_angle_to_quat(axis, angle)
     global q2
+    #first, we normalize the axis
+    modul = sqrt(axis[1]*axis[1] + axis[2]*axis[2] + axis[3]*axis[3])
+
+    global axis_norm = axis/modul
+
     q2 = quat(cosd(angle/2), sind(angle/2)*axis_norm[1], sind(angle/2)*axis_norm[2], sind(angle/2)*axis_norm[3])
 
     return q2
@@ -72,11 +81,11 @@ println("The Quaternion composed of AXIS = ", axis,
  " normalized as ", axis_norm, " and ANGLE = ", angle,
   " degrees is q = ", axis_angle_to_quat(axis_norm, angle))
 
-function quat_to_axis_angle(q2)
-    angle = 2*acosd(q2.s);
-    axis_norm[1] = q2.v1/sind(angle/2)
-    axis_norm[2] = q2.v2/sind(angle/2)
-    axis_norm[3] = q2.v3/sind(angle/2)
+function quat_to_axis_angle(q3)
+    angle3 = 2*acosd(q3.s);
+    axis_norm[1] = q3.v1/sind(angle3/2)
+    axis_norm[2] = q3.v2/sind(angle3/2)
+    axis_norm[3] = q3.v3/sind(angle3/2)
 
     return angle, axis_norm
 end
@@ -113,7 +122,7 @@ function mat_to_quat(mat)
 
         return q3
     else
-        return "ERROR [ANGLE = 0]"
+        return "THIS ROTATION MATRIX [IDENTITY MATRIX] HAS NO AXIS. ITS ROTATION ANGLE IS 0 [OR 360]."
     end
 
 end
