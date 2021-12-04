@@ -32,7 +32,7 @@ the_canvas = init_canvas(500,500)
 msg_label = GtkLabel("No message at this time")
 
 # defaults
-default_value = Dict("phi" => 0, "v_x" => 1, "v_y" => 0, "v_z" => 0, "alpha" => 70)
+default_value = Dict("phi" => 0, "v_x" => 1, "v_y" => 0, "v_z" => 0, "alpha" => 70, "q0" => 0, "q1" => 0, "q2" => 0, "q3" => 0)
 
 # an array to store the entry boxes
 entry_list = []
@@ -40,6 +40,8 @@ entry_list = []
 # an array of labels that we use to display normalized inputs,
 # and which also gets modified from the callback
 normalized_labels = []
+
+quatChanged = false
 
 function find_by_name(list, name)
     for item in list
@@ -74,6 +76,28 @@ function normalize_v()
         output_normalized("v_y_normalized", 0)
         output_normalized("v_z_normalized", 0)
     end
+end
+
+function normalize_q()
+    q0 = read_original_box("q0")
+    q1 = read_original_box("q1")
+    q2 = read_original_box("q2")
+    q3 = read_original_box("q3")
+
+    norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3)
+
+    if(norm!=0)
+        output_normalized("q0_normalized", q0 / norm)
+        output_normalized("q1_normalized", q1 / norm)
+        output_normalized("q2_normalized", q2 / norm)
+        output_normalized("q3_normalized", q3 / norm)
+    else
+        output_normalized("q0_normalized", 0)
+        output_normalized("q1_normalized", 0)
+        output_normalized("q2_normalized", 0)
+        output_normalized("q3_normalized", 0)
+
+    end
 
 
 end
@@ -91,9 +115,23 @@ function entry_box_callback(widget)
     name = get_gtk_property(widget, :name, String)
     text = get_gtk_property(widget, :text, String)
 
+    if (get_gtk_property(widget, :name, String) == "q0" ||
+        get_gtk_property(widget, :name, String) == "q1" ||
+        get_gtk_property(widget, :name, String) == "q2" ||
+        get_gtk_property(widget, :name, String) == "q3")
+
+        global quatChanged = true
+        println(quatChanged)
+
+    elseif (get_gtk_property(widget, :name, String) == "alpha" ||
+            get_gtk_property(widget, :name, String) == "v_x" ||
+            get_gtk_property(widget, :name, String) == "v_y" ||
+            get_gtk_property(widget, :name, String) == "v_z")
+        global quatChanged = false
+    end
+
     # checking that we tell user alpha has limits at 0 and 180
     if (get_gtk_property(widget, :name, String) == "alpha" && read_original_box("alpha") < 0)
-
         GAccessor.text(msg_label, "alpha" * " changed to 0")
 
     elseif (get_gtk_property(widget, :name, String) == "alpha" && read_original_box("alpha") > 180)
@@ -103,7 +141,6 @@ function entry_box_callback(widget)
         GAccessor.text(msg_label, name * " changed to " * text)
     end
 
-
     # change the correct normalized output
     if name[1] == 'v'
         normalize_v()
@@ -111,6 +148,8 @@ function entry_box_callback(widget)
         normalize_alpha()
     elseif name[1] == 'p'
         normalize_phi()
+    elseif name[1] == 'q'
+        normalize_q()
     end
 
     # actually draw the changes
@@ -174,7 +213,19 @@ function vector_angle_box()
     push!(vbox, bold_label("Angle"))
 
     push!(vbox, entry_box("alpha"))
+
     return vbox
+end
+
+function quaternion_box()
+    vbox = GtkBox(:v)
+
+    push!(vbox, bold_label("Quaternion"))
+    push!(vbox, entry_box("q0"))
+    push!(vbox, entry_box("q1"))
+    push!(vbox, entry_box("q2"))
+    push!(vbox, entry_box("q3"))
+
 end
 
 # Now put everything into the window,
@@ -187,6 +238,8 @@ function init_window(win, canvas)
     push!(control_box, phi_box())
     push!(control_box, GtkLabel(""))
     push!(control_box, vector_angle_box())
+    push!(control_box, GtkLabel(""))
+    push!(control_box, quaternion_box())
     push!(control_box, GtkLabel(""))
     push!(control_box, msg_label)
 
@@ -253,18 +306,46 @@ function draw_the_canvas(canvas)
 
     # read some normalized boxes and draw a line
     phi = 5  * read_normalized_label("phi_normalized")
-    v_x = 50 * read_normalized_label("v_x_normalized")
-    v_y = 50 * read_normalized_label("v_y_normalized")
-    v_z = 50 * read_normalized_label("v_z_normalized")
-
     alpha = read_original_box("alpha") * 0.05
+    v_x = 25 * read_normalized_label("v_x_normalized")
+    v_y = 25 * read_normalized_label("v_y_normalized")
+    v_z = 25 * read_normalized_label("v_z_normalized")
+
+    q0 = read_normalized_label("q0_normalized")
+    q1 = read_normalized_label("q1_normalized")
+    q2 = read_normalized_label("q2_normalized")
+    q3 = read_normalized_label("q3_normalized")
+
+    q = quat(q0, q1, q2, q3)
+
+    if(quatChanged == true)
+        angle_axis = quat_to_axis_angle(q)
+
+        alpha = angle_axis[1] * 0.05
+        v_x = 25 * angle_axis[2][1]
+        v_y = 25 * angle_axis[2][2]
+        v_z = 25 * angle_axis[2][3]
+
+        println(angle_axis[1])
+        println(angle_axis[2])
+    else
+        qConverted = axis_angle_to_quat([v_x;v_y;v_z], alpha)
+
+        q0 = qConverted.s
+        q1 = qConverted.v1
+        q2= qConverted.v2
+        q3 = qConverted.v3
+    end
+
+    println(alpha," ", q0," ", q1," ", q2," ", q3)
+
 
     if(alpha <= 0)
         alpha = 0
     end
 
-    if(alpha >= 180)
-        alpha = 180
+    if(alpha >= 180*0.05)
+        alpha = 180*0.05
     end
 
     #AXIS R3
