@@ -65,27 +65,35 @@ function axis_angle_to_mat(axis, angle)
     #first, we normalize the axis
     modul = sqrt(axis[1]*axis[1] + axis[2]*axis[2] + axis[3]*axis[3])
 
-    global axis_norm = axis/modul
+    global axis_norm
 
-    Z = [0 -axis_norm[3] axis_norm[2];
-         axis_norm[3] 0 -axis_norm[1];
-        -axis_norm[2] axis_norm[1] 0]
+    round(modul)
 
-    #formula Rodrigues
-    R = I + sind(angle)*Z + (1-cosd(angle))*(Z^2)
-    #just above, we multiply pi/180 to the angle (in degrees) to obtain the angle in radians
-    #so julia can do the operation we want
-
-    #next, we will check if R is a rotation matrix: R*R'=I and det(R)=1
-    #For this comprobation, we needed to round R*R' and det(R). That's because much times
-    #the result was 0.999999 and not 1
-    if (round.(R*R')== I && round(det(R))==1)
-        #we return the rotation matrix
-        return R
+    if (modul == 0)
+        return [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]
     else
-        print("R = ", R, "\nis NOT a rotation matrix\n")
-        println("R*R'= ", round.(R*R'))
-        println("det(R)= ", round(det(R)))
+        axis_norm = axis/modul
+
+        Z = [0 -axis_norm[3] axis_norm[2];
+             axis_norm[3] 0 -axis_norm[1];
+            -axis_norm[2] axis_norm[1] 0]
+
+        #formula Rodrigues
+        R = I + sind(angle)*Z + (1-cosd(angle))*(Z^2)
+        #just above, we multiply pi/180 to the angle (in degrees) to obtain the angle in radians
+        #so julia can do the operation we want
+
+        #next, we will check if R is a rotation matrix: R*R'=I and det(R)=1
+        #For this comprobation, we needed to round R*R' and det(R). That's because much times
+        #the result was 0.999999 and not 1
+        if (round.(R*R')== I && round(det(R))==1)
+            #we return the rotation matrix
+            return R
+        else
+            print("R = ", R, "\nis NOT a rotation matrix\n")
+            println("R*R'= ", round.(R*R'))
+            println("det(R)= ", round(det(R)))
+        end
     end
 end
 
@@ -117,13 +125,24 @@ function quat_to_axis_angle(q3)
 
     norm = sqrt(q3.s*q3.s + q3.v1*q3.v1 + q3.v2*q3.v2 + q3.v3*q3.v3)
 
-    angle3 = 2*acosd(q3.s/norm);
-
     global axis_norm = [0.0;0.0;0.0]
 
-    axis_norm[1] = (q3.v1/norm)/sind(angle3/2)
-    axis_norm[2] = (q3.v2/norm)/sind(angle3/2)
-    axis_norm[3] = (q3.v3/norm)/sind(angle3/2)
+    if(norm == 0)
+        angle3 = 0
+
+        axis_norm[1] = 0
+        axis_norm[2] = 0
+        axis_norm[3] = 0
+
+    else
+        angle3 = 2*acosd(q3.s/norm)
+
+        axis_norm[1] = (q3.v1/norm)/sind(angle3/2)
+        axis_norm[2] = (q3.v2/norm)/sind(angle3/2)
+        axis_norm[3] = (q3.v3/norm)/sind(angle3/2)
+
+    end
+
 
     return angle3, axis_norm
 end
@@ -151,5 +170,23 @@ function mat_to_quat(mat)
     else
         return "THIS ROTATION MATRIX [IDENTITY MATRIX] HAS NO AXIS. ITS ROTATION ANGLE IS 0 + 360*K [BEING K AN ENTER]. FOR THE RESULT THIS MATRIX HAS NO QUATERNION FORM."
     end
+end
+
+#-------------------------------------------------------------------- EXERCISE 4.3
+function scale_and_translation(v2d, scale, point)
+
+    v2d = v2d*scale
+
+    movement = [0.0;0.0]
+    v2dResult = [0.0;0.0]
+
+
+    movement[1] = point[1] - v2d[1]
+    movement[2] = point[2] - v2d[2]
+
+    v2dResult[1] = v2d[1] + movement[1]
+    v2dResult[2] = v2d[2] + movement[2]
+
+    return v2dResult
 
 end

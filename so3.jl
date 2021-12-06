@@ -22,7 +22,7 @@ function init_canvas(h,w)
 end
 
 # make the canvas
-the_canvas = init_canvas(500,500)
+the_canvas = init_canvas(500,750)
 
 
 # --------- part 2 -------------
@@ -31,8 +31,14 @@ the_canvas = init_canvas(500,500)
 # a widget for status messages that we define at the beginning so we can use it from the callback
 msg_label = GtkLabel("No message at this time")
 
+matrix_label1 = GtkLabel("")
+matrix_label2 = GtkLabel("")
+matrix_label3 = GtkLabel("")
+
+global matrixR = [0.0 0.0 0.0; 0.0 0.0 0.0; 0.0 0.0 0.0]
+
 # defaults
-default_value = Dict("phi" => 0, "v_x" => 1, "v_y" => 0, "v_z" => 0, "alpha" => 70, "q0" => 0, "q1" => 0, "q2" => 0, "q3" => 0)
+default_value = Dict("phi"=>0,"v_x"=>1,"v_y"=>0,"v_z"=>0,"alpha"=>70, "q0" => 0, "q1" => 0, "q2" => 0, "q3" => 0, "m1" => 0, "m2" => 0, "m3" => 0)
 
 # an array to store the entry boxes
 entry_list = []
@@ -41,6 +47,7 @@ entry_list = []
 # and which also gets modified from the callback
 normalized_labels = []
 
+#we comprobate if quaternions change, for now, is false
 quatChanged = false
 
 function find_by_name(list, name)
@@ -84,21 +91,25 @@ function normalize_q()
     q2 = read_original_box("q2")
     q3 = read_original_box("q3")
 
-    norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3)
+    normQ = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3)
 
-    if(norm!=0)
-        output_normalized("q0_normalized", q0 / norm)
-        output_normalized("q1_normalized", q1 / norm)
-        output_normalized("q2_normalized", q2 / norm)
-        output_normalized("q3_normalized", q3 / norm)
-    else
+    if(normQ == 0)
         output_normalized("q0_normalized", 0)
         output_normalized("q1_normalized", 0)
         output_normalized("q2_normalized", 0)
         output_normalized("q3_normalized", 0)
+    else
+        output_normalized("q0_normalized", q0 / normQ)
+        output_normalized("q1_normalized", q1 / normQ)
+        output_normalized("q2_normalized", q2 / normQ)
+        output_normalized("q3_normalized", q3 / normQ)
 
     end
 
+end
+
+function print_m()
+    h=1
 
 end
 
@@ -115,13 +126,14 @@ function entry_box_callback(widget)
     name = get_gtk_property(widget, :name, String)
     text = get_gtk_property(widget, :text, String)
 
+    get_gtk_property(widget, :name, String) == "matrixR"
+
     if (get_gtk_property(widget, :name, String) == "q0" ||
         get_gtk_property(widget, :name, String) == "q1" ||
         get_gtk_property(widget, :name, String) == "q2" ||
         get_gtk_property(widget, :name, String) == "q3")
 
         global quatChanged = true
-        println(quatChanged)
 
     elseif (get_gtk_property(widget, :name, String) == "alpha" ||
             get_gtk_property(widget, :name, String) == "v_x" ||
@@ -144,12 +156,24 @@ function entry_box_callback(widget)
     # change the correct normalized output
     if name[1] == 'v'
         normalize_v()
+        matrix_box1()
+        matrix_box2()
+        matrix_box3()
     elseif name[1] == 'a'
         normalize_alpha()
+        matrix_box1()
+        matrix_box2()
+        matrix_box3()
     elseif name[1] == 'p'
         normalize_phi()
+        matrix_box1()
+        matrix_box2()
+        matrix_box3()
     elseif name[1] == 'q'
         normalize_q()
+        matrix_box1()
+        matrix_box2()
+        matrix_box3()
     end
 
     # actually draw the changes
@@ -225,12 +249,22 @@ function quaternion_box()
     push!(vbox, entry_box("q1"))
     push!(vbox, entry_box("q2"))
     push!(vbox, entry_box("q3"))
+end
 
+function matrix_box1()
+    GAccessor.text(matrix_label1, string(matrixR[1,:]))
+end
+
+function matrix_box2()
+    GAccessor.text(matrix_label2, string(matrixR[2,:]))
+end
+
+function matrix_box3()
+    GAccessor.text(matrix_label3, string(matrixR[3,:]))
 end
 
 # Now put everything into the window,
 # including the canvas
-
 function init_window(win, canvas)
 
     # make a vertically stacked box for the data entry widgets
@@ -240,6 +274,13 @@ function init_window(win, canvas)
     push!(control_box, vector_angle_box())
     push!(control_box, GtkLabel(""))
     push!(control_box, quaternion_box())
+    push!(control_box, GtkLabel(""))
+    push!(control_box, bold_label("Matrix"))
+    push!(control_box, matrix_box1())
+    push!(control_box, GtkLabel(""))
+    push!(control_box, matrix_box2())
+    push!(control_box, GtkLabel(""))
+    push!(control_box, matrix_box3())
     push!(control_box, GtkLabel(""))
     push!(control_box, msg_label)
 
@@ -326,18 +367,22 @@ function draw_the_canvas(canvas)
         v_y = 25 * angle_axis[2][2]
         v_z = 25 * angle_axis[2][3]
 
-        println(angle_axis[1])
-        println(angle_axis[2])
+
+        # println(angle_axis[1])
+        # println(angle_axis[2])
     else
         qConverted = axis_angle_to_quat([v_x;v_y;v_z], alpha)
 
         q0 = qConverted.s
         q1 = qConverted.v1
-        q2= qConverted.v2
+        q2 = qConverted.v2
         q3 = qConverted.v3
     end
 
-    println(alpha," ", q0," ", q1," ", q2," ", q3)
+
+    global matrixR = axis_angle_to_mat([v_x;v_y;v_z], alpha)
+
+    # println(alpha," ", q0," ", q1," ", q2," ", q3)
 
 
     if(alpha <= 0)
@@ -355,6 +400,9 @@ function draw_the_canvas(canvas)
 
     v = [v_x; v_y; v_z]
 
+    # println("VR2:", v)
+
+
     #WE ROTATE AXIS IN R3
     Xr = rotate_phi_z(phi, Z, X)
     Yr = rotate_phi_z(phi, Z, Y)
@@ -367,17 +415,40 @@ function draw_the_canvas(canvas)
     Yr2 = to_2d(Yr)
     Zr2 = to_2d(Zr)
 
+    #WE PROJECT THE ROTATED AXIS IN R3 TO R2
+    X2 = to_2d(X)
+    Y2 = to_2d(Y)
+    Z2 = to_2d(Z)
+
     vr2 = to_2d(vr)
+
+    #AXIS IN R3 SCALED -VECTOR-
+    Xv = scale_and_translation(Xr2, 0.2, vr2*alpha)
+    Yv = scale_and_translation(Yr2, 0.2, vr2*alpha)
+    Zv = scale_and_translation(Zr2, 0.2, vr2*alpha)
+
 
     #DRAW X AXIS (RED)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 1, 0, 0)
     move_to(ctx, 250, 250)
-    line_to(ctx, 250 + Xr2[1]*100, 250 - Xr2[2]*100)
+    line_to(ctx, 250 + X2[1]*100, 250 - X2[2]*100)
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 250 + Xr2[1]*100, 250 - Xr2[2]*100, 5)
+    circle(ctx, 250 + X2[1]*100, 250 - X2[2]*100, 5)
+    set_source_rgb(ctx, 1, 0, 0)
+    fill(ctx)
+
+    #DRAW X AXIS SCALED -VECTOR- (RED)
+    set_line_width(ctx, 2)
+    set_source_rgb(ctx, 1, 0, 0)
+    move_to(ctx, 250, 250)
+    line_to(ctx, 250 + Xv[1], 250 - Xv[2])
+    stroke(ctx)
+
+    #circle at the end of the axis
+    circle(ctx, Xv[1], Xv[2], 1)
     set_source_rgb(ctx, 1, 0, 0)
     fill(ctx)
 
@@ -385,25 +456,49 @@ function draw_the_canvas(canvas)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 1, 0)
     move_to(ctx, 250, 250)
-    line_to(ctx, 250 + Yr2[1]*100, 250 - Yr2[2]*100)
+    line_to(ctx, 250 + Y2[1]*100, 250 - Y2[2]*100)
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 250 + Yr2[1]*100, 250 - Yr2[2]*100, 5)
+    circle(ctx, 250 + Y2[1]*100, 250 - Y2[2]*100, 5)
     set_source_rgb(ctx, 0, 1, 0)
     fill(ctx)
+
+    #DRAW Y AXIS SCALED -VECTOR- (GREEN)
+    # set_line_width(ctx, 2)
+    # set_source_rgb(ctx, 1, 0, 0)
+    # move_to(ctx, 250, 250)
+    # line_to(ctx, 250 + Yv[1], 250 - Yv[2])
+    # stroke(ctx)
+    #
+    # #circle at the end of the axis
+    # circle(ctx, 250 + Yv[1], 250 - Yv[2], 5)
+    # set_source_rgb(ctx, 0, 1, 0)
+    # fill(ctx)
 
     #DRAW Z AXIS (BLUE)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 0, 1)
     move_to(ctx, 250, 250)
-    line_to(ctx, 250 + Zr2[1]*100, 250 - Zr2[2]*100)
+    line_to(ctx, 250 + Z2[1]*100, 250 - Z2[2]*100)
     stroke(ctx)
 
     #circles at the end of the axis
-    circle(ctx, 250 + Zr2[1]*100, 250 - Zr2[2]*100, 5)
+    circle(ctx, 250 + Z2[1]*100, 250 - Z2[2]*100, 5)
     set_source_rgb(ctx, 0, 0, 1)
     fill(ctx)
+
+    #DRAW Z AXIS SCALED -VECTOR- (BLUE)
+    # set_line_width(ctx, 2)
+    # set_source_rgb(ctx, 1, 0, 0)
+    # move_to(ctx, 250, 250)
+    # line_to(ctx, 250 + Zv[1], 250 - Zv[2])
+    # stroke(ctx)
+    #
+    # #circle at the end of the axis
+    # circle(ctx, 250 + Zv[1], 250 - Zv[2], 5)
+    # set_source_rgb(ctx, 0, 0, 1)
+    # fill(ctx)
 
     #DRAW VECTOR (BLACK)
     set_line_width(ctx, 2)
