@@ -423,9 +423,9 @@ function draw_the_canvas(canvas)
     vr2 = to_2d(vr)
 
     #AXIS IN R3 SCALED -VECTOR-
-    Xv = scale_and_translation(Xr2, 0.2, vr2*alpha)
-    Yv = scale_and_translation(Yr2, 0.2, vr2*alpha)
-    Zv = scale_and_translation(Zr2, 0.2, vr2*alpha)
+    Xv = scale_and_translation(Xr2, 1, vr2*alpha)
+    Yv = scale_and_translation(Yr2, 1, vr2*alpha)
+    Zv = scale_and_translation(Zr2, 1, vr2*alpha)
 
 
     #DRAW X AXIS (RED)
@@ -443,7 +443,7 @@ function draw_the_canvas(canvas)
     #DRAW X AXIS SCALED -VECTOR- (RED)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 1, 0, 0)
-    move_to(ctx, 250, 250)
+    move_to(ctx, 250 + vr2[1]*alpha, 250 - vr2[2]*alpha)
     line_to(ctx, 250 + Xv[1], 250 - Xv[2])
     stroke(ctx)
 
