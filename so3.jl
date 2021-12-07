@@ -22,7 +22,7 @@ function init_canvas(h,w)
 end
 
 # make the canvas
-the_canvas = init_canvas(500,750)
+the_canvas = init_canvas(750,750)
 
 
 # --------- part 2 -------------
@@ -108,11 +108,6 @@ function normalize_q()
 
 end
 
-function print_m()
-    h=1
-
-end
-
 function normalize_alpha()
     output_normalized("alpha_normalized", read_original_box("alpha"))
 end
@@ -120,6 +115,19 @@ end
 function normalize_phi()
     output_normalized("phi_normalized", read_original_box("phi"))
 end
+
+function matrix_box1()
+    GAccessor.text(matrix_label1, string(matrixR[1,:]))
+end
+
+function matrix_box2()
+    GAccessor.text(matrix_label2, string(matrixR[2,:]))
+end
+
+function matrix_box3()
+    GAccessor.text(matrix_label3, string(matrixR[3,:]))
+end
+
 
 function entry_box_callback(widget)
     # who called us?
@@ -249,18 +257,6 @@ function quaternion_box()
     push!(vbox, entry_box("q1"))
     push!(vbox, entry_box("q2"))
     push!(vbox, entry_box("q3"))
-end
-
-function matrix_box1()
-    GAccessor.text(matrix_label1, string(matrixR[1,:]))
-end
-
-function matrix_box2()
-    GAccessor.text(matrix_label2, string(matrixR[2,:]))
-end
-
-function matrix_box3()
-    GAccessor.text(matrix_label3, string(matrixR[3,:]))
 end
 
 # Now put everything into the window,
@@ -400,9 +396,6 @@ function draw_the_canvas(canvas)
 
     v = [v_x; v_y; v_z]
 
-    # println("VR2:", v)
-
-
     #WE ROTATE AXIS IN R3
     Xr = rotate_phi_z(phi, Z, X)
     Yr = rotate_phi_z(phi, Z, Y)
@@ -423,92 +416,93 @@ function draw_the_canvas(canvas)
     vr2 = to_2d(vr)
 
     #AXIS IN R3 SCALED -VECTOR-
-    Xv = scale_and_translation(Xr2, 1, vr2*alpha)
-    Yv = scale_and_translation(Yr2, 1, vr2*alpha)
-    Zv = scale_and_translation(Zr2, 1, vr2*alpha)
+    Xv = scale_and_translation(Xr2*100, 0.5, vr2*alpha)
+    Yv = scale_and_translation(Yr2*100, 0.5, vr2*alpha)
+    Zv = scale_and_translation(Zr2*100, 0.5, vr2*alpha)
 
+    println("Xv ", Xv, "\nYv ", Yv, "\nZv ", Zv)
 
     #DRAW X AXIS (RED)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 1, 0, 0)
-    move_to(ctx, 250, 250)
-    line_to(ctx, 250 + X2[1]*100, 250 - X2[2]*100)
+    move_to(ctx, 350, 350)
+    line_to(ctx, 350 + Xr2[1]*100, 350 - Xr2[2]*100)
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 250 + X2[1]*100, 250 - X2[2]*100, 5)
+    circle(ctx, 350 + Xr2[1]*100, 350 - Xr2[2]*100, 5)
     set_source_rgb(ctx, 1, 0, 0)
     fill(ctx)
 
     #DRAW X AXIS SCALED -VECTOR- (RED)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 1, 0, 0)
-    move_to(ctx, 250 + vr2[1]*alpha, 250 - vr2[2]*alpha)
-    line_to(ctx, 250 + Xv[1], 250 - Xv[2])
+    move_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
+    line_to(ctx, 350 + vr2[1] + Xv[1], 350 - vr2[2] - Xv[2])
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, Xv[1], Xv[2], 1)
+    circle(ctx, 350 + vr2[1] + Xv[1], 350 - vr2[2] - Xv[2], 2)
     set_source_rgb(ctx, 1, 0, 0)
     fill(ctx)
 
     #DRAW Y AXIS (GREEN)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 1, 0)
-    move_to(ctx, 250, 250)
-    line_to(ctx, 250 + Y2[1]*100, 250 - Y2[2]*100)
+    move_to(ctx, 350, 350)
+    line_to(ctx, 350 + Yr2[1]*100, 350 - Yr2[2]*100)
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 250 + Y2[1]*100, 250 - Y2[2]*100, 5)
+    circle(ctx, 350 + Yr2[1]*100, 350 - Yr2[2]*100, 5)
     set_source_rgb(ctx, 0, 1, 0)
     fill(ctx)
 
     #DRAW Y AXIS SCALED -VECTOR- (GREEN)
-    # set_line_width(ctx, 2)
-    # set_source_rgb(ctx, 1, 0, 0)
-    # move_to(ctx, 250, 250)
-    # line_to(ctx, 250 + Yv[1], 250 - Yv[2])
-    # stroke(ctx)
-    #
-    # #circle at the end of the axis
-    # circle(ctx, 250 + Yv[1], 250 - Yv[2], 5)
-    # set_source_rgb(ctx, 0, 1, 0)
-    # fill(ctx)
+    set_line_width(ctx, 2)
+    set_source_rgb(ctx, 0, 1, 0)
+    move_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
+    line_to(ctx, 350 + vr2[1] + Yv[1], 350 - vr2[2] - Yv[2])
+    stroke(ctx)
+
+    #circle at the end of the axis
+    circle(ctx, 350 + vr2[1] + Yv[1], 350 - vr2[2] - Yv[2], 2)
+    set_source_rgb(ctx, 0, 1, 0)
+    fill(ctx)
 
     #DRAW Z AXIS (BLUE)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 0, 1)
-    move_to(ctx, 250, 250)
-    line_to(ctx, 250 + Z2[1]*100, 250 - Z2[2]*100)
+    move_to(ctx, 350, 350)
+    line_to(ctx, 350 + Zr2[1]*100, 350 - Zr2[2]*100)
     stroke(ctx)
 
     #circles at the end of the axis
-    circle(ctx, 250 + Z2[1]*100, 250 - Z2[2]*100, 5)
+    circle(ctx, 350 + Zr2[1]*100, 350 - Zr2[2]*100, 5)
     set_source_rgb(ctx, 0, 0, 1)
     fill(ctx)
 
     #DRAW Z AXIS SCALED -VECTOR- (BLUE)
-    # set_line_width(ctx, 2)
-    # set_source_rgb(ctx, 1, 0, 0)
-    # move_to(ctx, 250, 250)
-    # line_to(ctx, 250 + Zv[1], 250 - Zv[2])
-    # stroke(ctx)
-    #
-    # #circle at the end of the axis
-    # circle(ctx, 250 + Zv[1], 250 - Zv[2], 5)
-    # set_source_rgb(ctx, 0, 0, 1)
-    # fill(ctx)
+    set_line_width(ctx, 2)
+    set_source_rgb(ctx, 0, 0, 1)
+    move_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
+    line_to(ctx, 350 + vr2[1] + Zv[1], 350 - vr2[2] - Zv[2])
+    stroke(ctx)
+
+    #circle at the end of the axis
+    circle(ctx, 350 + vr2[1] + Zv[1], 350 - vr2[2] - Zv[2], 2)
+    set_source_rgb(ctx, 0, 0, 1)
+    fill(ctx)
 
     #DRAW VECTOR (BLACK)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 0, 0)
-    move_to(ctx, 250, 250)
-    line_to(ctx, 250 + vr2[1]*alpha, 250 - vr2[2]*alpha)
+    move_to(ctx, 350, 350)
+    line_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
     stroke(ctx)
 
     #circles at the end of the axis
-    circle(ctx, 250 + vr2[1]*alpha, 250 - vr2[2]*alpha, 3)
+    circle(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha, 3)
     set_source_rgb(ctx, 0, 0, 0)
     fill(ctx)
 

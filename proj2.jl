@@ -180,12 +180,11 @@ function scale_and_translation(v2d, scale, point)
     movement = [0.0;0.0]
     v2dResult = [0.0;0.0]
 
+    # movement[1] = point[1] - v2d[1]
+    # movement[2] = point[2] - v2d[2]
 
-    movement[1] = point[1] - v2d[1]
-    movement[2] = point[2] - v2d[2]
-
-    v2dResult[1] = v2d[1] + movement[1]
-    v2dResult[2] = v2d[2] + movement[2]
+    v2dResult[1] = v2d[1] + point[1]
+    v2dResult[2] = v2d[2] + point[2]
 
     return v2dResult
 
