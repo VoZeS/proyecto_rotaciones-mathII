@@ -403,10 +403,34 @@ function draw_the_canvas(canvas)
 
     vr = rotate_phi_z(phi, Z, v)
 
+    println("Alpha ", alpha*20)
+    println("Vr*alpha ", vr*alpha)
+    println("Xr ", Xr)
+
+    Xvr = rotate_phi_z(alpha*20, vr*alpha, Xr)
+    Yvr = rotate_phi_z(alpha*20, vr*alpha, Yr)
+    Zvr = rotate_phi_z(alpha*20, vr*alpha, Zr)
+
+    println("Xvr ", Xvr)
+    println("Yvr ", Yvr)
+    println("Zvr ", Zvr)
+
+
+    #AXIS IN R3 SCALED -VECTOR-
+    Xv = scale_and_translation(Xvr*100, 0.5, vr*alpha)
+    Yv = scale_and_translation(Yvr*100, 0.5, vr*alpha)
+    Zv = scale_and_translation(Zvr*100, 0.5, vr*alpha)
+
+
     #WE PROJECT THE ROTATED AXIS IN R3 TO R2
     Xr2 = to_2d(Xr)
     Yr2 = to_2d(Yr)
     Zr2 = to_2d(Zr)
+
+    #WE PROJECT THE ROTATED AXIS IN R3 TO R2
+    Xvr2 = to_2d(Xv)
+    Yvr2 = to_2d(Yv)
+    Zvr2 = to_2d(Zv)
 
     #WE PROJECT THE ROTATED AXIS IN R3 TO R2
     X2 = to_2d(X)
@@ -415,12 +439,7 @@ function draw_the_canvas(canvas)
 
     vr2 = to_2d(vr)
 
-    #AXIS IN R3 SCALED -VECTOR-
-    Xv = scale_and_translation(Xr2*100, 0.5, vr2*alpha)
-    Yv = scale_and_translation(Yr2*100, 0.5, vr2*alpha)
-    Zv = scale_and_translation(Zr2*100, 0.5, vr2*alpha)
-
-    println("Xv ", Xv, "\nYv ", Yv, "\nZv ", Zv)
+    #println("Xv ", Xv, "\nYv ", Yv, "\nZv ", Zv)
 
     #DRAW X AXIS (RED)
     set_line_width(ctx, 2)
@@ -438,11 +457,11 @@ function draw_the_canvas(canvas)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 1, 0, 0)
     move_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
-    line_to(ctx, 350 + vr2[1] + Xv[1], 350 - vr2[2] - Xv[2])
+    line_to(ctx, 350 + vr2[1] + Xvr2[1], 350 - vr2[2] - Xvr2[2])
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 350 + vr2[1] + Xv[1], 350 - vr2[2] - Xv[2], 2)
+    circle(ctx, 350 + vr2[1] + Xvr2[1], 350 - vr2[2] - Xvr2[2], 2)
     set_source_rgb(ctx, 1, 0, 0)
     fill(ctx)
 
@@ -462,11 +481,11 @@ function draw_the_canvas(canvas)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 1, 0)
     move_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
-    line_to(ctx, 350 + vr2[1] + Yv[1], 350 - vr2[2] - Yv[2])
+    line_to(ctx, 350 + vr2[1] + Yvr2[1], 350 - vr2[2] - Yvr2[2])
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 350 + vr2[1] + Yv[1], 350 - vr2[2] - Yv[2], 2)
+    circle(ctx, 350 + vr2[1] + Yvr2[1], 350 - vr2[2] - Yvr2[2], 2)
     set_source_rgb(ctx, 0, 1, 0)
     fill(ctx)
 
@@ -486,19 +505,25 @@ function draw_the_canvas(canvas)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 0, 1)
     move_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
-    line_to(ctx, 350 + vr2[1] + Zv[1], 350 - vr2[2] - Zv[2])
+    line_to(ctx, 350 + vr2[1] + Zvr2[1], 350 - vr2[2] - Zvr2[2])
     stroke(ctx)
 
     #circle at the end of the axis
-    circle(ctx, 350 + vr2[1] + Zv[1], 350 - vr2[2] - Zv[2], 2)
+    circle(ctx, 350 + vr2[1] + Zvr2[1], 350 - vr2[2] - Zvr2[2], 2)
     set_source_rgb(ctx, 0, 0, 1)
     fill(ctx)
 
     #DRAW VECTOR (BLACK)
     set_line_width(ctx, 2)
     set_source_rgb(ctx, 0, 0, 0)
-    move_to(ctx, 350, 350)
-    line_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
+
+    if (350+vr2[1]*alpha>1000 ||350 - vr2[2]*alpha>1000 )
+        move_to(ctx, 350, 350)
+        line_to(ctx, 350, 350)
+    else
+        move_to(ctx, 350, 350)
+        line_to(ctx, 350 + vr2[1]*alpha, 350 - vr2[2]*alpha)
+    end
     stroke(ctx)
 
     #circles at the end of the axis

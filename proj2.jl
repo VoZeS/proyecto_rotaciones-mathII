@@ -24,7 +24,7 @@ function to_2d(V3)
 
     V2 = M*V3 #operation to transform V3 of R3 in V2 in R2
 
-    # print("The vector ", V3, " representated in R2 is: ", V2)
+    println("The vector ", V3, " representated in R2 is: ", V2)
     # println()
 
     return V2
@@ -32,9 +32,17 @@ end
 
 #-------------------------------------------------------------------- EXERCISE 2.3
 function rotate_phi_z(phi, z, V)
-    Z = [0 -z[3] z[2];
-         z[3] 0 -z[1];
-        -z[2] z[1] 0]
+
+    global z_norm
+    global z_module
+
+    z_module = sqrt(z[1]*z[1]+z[2]*z[2]+z[3]*z[3])
+
+    z_norm = z/z_module
+
+    Z = [0.0 -z_norm[3] z_norm[2];
+         z_norm[3] 0.0 -z_norm[1];
+        -z_norm[2] z_norm[1] 0.0]
 
     #formula de Rodriges to find "R", the rotation matrix
     R = I + sind(phi)*Z + (1-cosd(phi))*(Z^2)
@@ -114,16 +122,22 @@ function axis_angle_to_quat(axis, angle)
     #first, we normalize the axis
     modul = sqrt(axis[1]*axis[1] + axis[2]*axis[2] + axis[3]*axis[3])
 
-    global axis_norm = axis/modul
+if (modul==0)
+        print("\n QUATERNION MODULE IS 0")
+        return 0
+    else
+        global axis_norm = axis/modul
 
-    q2 = quat(cosd(angle/2), sind(angle/2)*axis_norm[1], sind(angle/2)*axis_norm[2], sind(angle/2)*axis_norm[3])
+        q2 = quat(cosd(angle/2), sind(angle/2)*axis_norm[1], sind(angle/2)*axis_norm[2], sind(angle/2)*axis_norm[3])
 
-    return q2
+        return q2
+    end
 end
 
 function quat_to_axis_angle(q3)
 
     norm = sqrt(q3.s*q3.s + q3.v1*q3.v1 + q3.v2*q3.v2 + q3.v3*q3.v3)
+
 
     global axis_norm = [0.0;0.0;0.0]
 
@@ -136,14 +150,15 @@ function quat_to_axis_angle(q3)
 
     else
         angle3 = 2*acosd(q3.s/norm)
-
+    end
+    if (angle3==0)
+        println("Angle of the quaternion = 0  Returning 0 axis")
+        return angle3, axis_norm
+    else
         axis_norm[1] = (q3.v1/norm)/sind(angle3/2)
         axis_norm[2] = (q3.v2/norm)/sind(angle3/2)
         axis_norm[3] = (q3.v3/norm)/sind(angle3/2)
-
     end
-
-
     return angle3, axis_norm
 end
 
@@ -173,19 +188,24 @@ function mat_to_quat(mat)
 end
 
 #-------------------------------------------------------------------- EXERCISE 4.3
-function scale_and_translation(v2d, scale, point)
+function scale_and_translation(v3d, scale, point)
 
-    v2d = v2d*scale
+println("V3D ", v3d)
 
-    movement = [0.0;0.0]
-    v2dResult = [0.0;0.0]
+    v3d = v3d*scale
+
+    println("V3D SCALED ", v3d)
+
+    #movement = [0.0;0.0]
+    v3dResult = [0.0;0.0;0.0]
 
     # movement[1] = point[1] - v2d[1]
     # movement[2] = point[2] - v2d[2]
 
-    v2dResult[1] = v2d[1] + point[1]
-    v2dResult[2] = v2d[2] + point[2]
+    v3dResult[1] = v3d[1] + point[1]
+    v3dResult[2] = v3d[2] + point[2]
+    v3dResult[3] = v3d[3] + point[3]
 
-    return v2dResult
+    return v3dResult
 
 end
