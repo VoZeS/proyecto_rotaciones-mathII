@@ -59,6 +59,9 @@ function rotate_phi_z(phi, z, V)
         # println()
         return U
     else
+        if(phi==0)
+            return U = [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]
+        end
         print("R = ", R, "\nis NOT a rotation matrix\n")
         println("R*R'= ", round.(R*R'))
         println("det(R)= ", round(det(R)))
