@@ -403,23 +403,23 @@ function draw_the_canvas(canvas)
 
     vr = rotate_phi_z(phi, Z, v)
 
-    println("Alpha ", alpha*20)
-    println("Vr*alpha ", vr*alpha)
-    println("Xr ", Xr)
+    # println("Alpha ", alpha*20)
+    # println("Vr*alpha ", vr*alpha)
+    # println("Xr ", Xr)
 
     Xvr = rotate_phi_z(alpha*20, vr*alpha, Xr)
     Yvr = rotate_phi_z(alpha*20, vr*alpha, Yr)
     Zvr = rotate_phi_z(alpha*20, vr*alpha, Zr)
 
-    println("Xvr ", Xvr)
-    println("Yvr ", Yvr)
-    println("Zvr ", Zvr)
+    # println("Xvr ", Xvr)
+    # println("Yvr ", Yvr)
+    # println("Zvr ", Zvr)
 
 
     #AXIS IN R3 SCALED -VECTOR-
-    Xv = scale_and_translation(Xvr*100, 0.5, vr*alpha)
-    Yv = scale_and_translation(Yvr*100, 0.5, vr*alpha)
-    Zv = scale_and_translation(Zvr*100, 0.5, vr*alpha)
+    Xv = scale_and_translation(Xvr*100, 0.25, vr*alpha)
+    Yv = scale_and_translation(Yvr*100, 0.25, vr*alpha)
+    Zv = scale_and_translation(Zvr*100, 0.25, vr*alpha)
 
 
     #WE PROJECT THE ROTATED AXIS IN R3 TO R2

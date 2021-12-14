@@ -24,7 +24,7 @@ function to_2d(V3)
 
     V2 = M*V3 #operation to transform V3 of R3 in V2 in R2
 
-    println("The vector ", V3, " representated in R2 is: ", V2)
+    # println("The vector ", V3, " representated in R2 is: ", V2)
     # println()
 
     return V2
@@ -52,20 +52,26 @@ function rotate_phi_z(phi, z, V)
     #next, we will check if R is a rotation matrix: R*R'=I and det(R)=1
     #For this comprobation, we needed to round R*R' and det(R). That's because much times
     #the result was 0.999999 and not 1
-    if (round.(R*R') == I && round(det(R)) == 1)
-        #we find the rotated matrix:
-        U = R*V
-        # print("V rotated is = ", U)
-        # println()
-        return U
-    else
-        if(phi==0)
-            return U = [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]
-        end
-        print("R = ", R, "\nis NOT a rotation matrix\n")
-        println("R*R'= ", round.(R*R'))
-        println("det(R)= ", round(det(R)))
+    if(phi==0)
+        return V
+    end
+    if (z != [0.0;0.0;0.0])
+        if (round.(R*R') == I && round(det(R)) == 1)
+            #we find the rotated matrix:
+            U = R*V
+            # print("V rotated is = ", U)
+            # println()
+            return U
+        else
 
+            print("R = ", R, "\nis NOT a rotation matrix\n")
+            println("R*R'= ", round.(R*R'))
+            println("det(R)= ", round(det(R)))
+
+        end
+    else
+
+            return [0.0 0.0 0.0; 0.0 0.0 0.0;0.0 0.0 0.0]
     end
 end
 
@@ -125,16 +131,16 @@ function axis_angle_to_quat(axis, angle)
     #first, we normalize the axis
     modul = sqrt(axis[1]*axis[1] + axis[2]*axis[2] + axis[3]*axis[3])
 
-if (modul==0)
-        print("\n QUATERNION MODULE IS 0")
-        return 0
-    else
+# if (modul==0)
+#         print("\n QUATERNION MODULE IS 0")
+#         return 0
+#     else
         global axis_norm = axis/modul
 
         q2 = quat(cosd(angle/2), sind(angle/2)*axis_norm[1], sind(angle/2)*axis_norm[2], sind(angle/2)*axis_norm[3])
 
         return q2
-    end
+    # end
 end
 
 function quat_to_axis_angle(q3)
@@ -155,7 +161,7 @@ function quat_to_axis_angle(q3)
         angle3 = 2*acosd(q3.s/norm)
     end
     if (angle3==0)
-        println("Angle of the quaternion = 0  Returning 0 axis")
+        # println("Angle of the quaternion = 0  Returning 0 axis")
         return angle3, axis_norm
     else
         axis_norm[1] = (q3.v1/norm)/sind(angle3/2)
@@ -193,11 +199,11 @@ end
 #-------------------------------------------------------------------- EXERCISE 4.3
 function scale_and_translation(v3d, scale, point)
 
-println("V3D ", v3d)
+# println("V3D ", v3d)
 
     v3d = v3d*scale
 
-    println("V3D SCALED ", v3d)
+    # println("V3D SCALED ", v3d)
 
     #movement = [0.0;0.0]
     v3dResult = [0.0;0.0;0.0]
