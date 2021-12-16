@@ -1,3 +1,4 @@
+#EXERCISE MADE BY ERIK MARTÍN GARZÓN & DAVID BOCES OBIS
 # the packages we need
 using Gtk, Graphics, Logging, Printf
 
