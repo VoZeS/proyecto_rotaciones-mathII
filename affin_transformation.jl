@@ -71,6 +71,7 @@ function rotate_phi_z(phi, z, V)
     end
 end
 
+# FUNCTION TO DRAW WHAT THE CAMERA IS SEEING  (EX 3.1)
 function focal_camera(cameraMatrixInv, focus, point)
     projMat=[focus 0 0 0; 0 focus 0 0;  0 0 1 0]
 
@@ -83,6 +84,7 @@ function focal_camera(cameraMatrixInv, focus, point)
     return finalPointHomo
 end
 
+# FUNCTION TO DRAW FOCAL CAMERA POINTS IN SPACE (EX 3.2)
 function focal_camera_points_in_space(cameraMatrix, focus, point2d)
     pointHomo = vcat(point2d, [focus; 1])
 
