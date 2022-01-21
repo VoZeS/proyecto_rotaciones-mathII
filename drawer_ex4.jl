@@ -4,12 +4,6 @@ using Gtk, Graphics, Logging, Printf
 
 include("affin_transformation.jl")
 #File opening and reading matrix and vor together
-A=readdlm("circle.txt", Float64)
-
-#Reading and saving matrix size
-s=size(A)
-s1=s[1] #rows
-s2=s[2] #columns
 
 # the main window
 win = GtkWindow("SO(3)")
@@ -63,9 +57,8 @@ end
 function init_window(win, canvas)
     # make a box for the drawing canvas
     canvas_box = GtkBox(:v)
-    push!(canvas_box, bold_label("EJERCICIO 1:                                                                                                                                                          EJERCICIO 2:"))
-    push!(canvas_box, bold_label("Proyecta los puntos del archivo al plano focal de la camara y dibuja el resultado.                                           Haz un dibujo 3d de toda la escena, con los dos sistemas ortonormales de coordenadas y
-                                                                                                                                                                                                                                     los puntos de la circunferencia."))
+    push!(canvas_box, bold_label("EJERCICIO 4.4:                                                                                                                                                          EJERCICIO 4.5:"))
+    push!(canvas_box, bold_label("                  Dibuja en 3d la escena, en las coordenadas globales.                                                                              Dibuja en 3d la misma escena, pero esta vez en las coordenadas de la camara."))
     push!(canvas_box, canvas)
 
     # make a containing box that will stack the widgets and the canvas side by side
@@ -106,8 +99,8 @@ function draw_the_canvas(canvas)
     # stroke(ctx)
 
     # ------------------------------------------------------------------ DATA
-    originX = 850
-    originY = 300
+    originX = 200
+    originY = 500
 
     #AXIS R3
     X = [1;0;0]
@@ -119,50 +112,96 @@ function draw_the_canvas(canvas)
     Y2 = to_2d(Y)
     Z2 = to_2d(Z)
 
-    cam = [1;6;1]
+    cam = [2.2837;5.0798;2.2328]
 
-    ay = 90
-    az = -20
-    focus = 3
+    angle = -150 #degree
+
+    u = [0.01;-0.2;1.0] #camera's rotation AXIS
 
     #Setting camera coords
     camCoord2d = to_2d(cam)*100
 
     #Camera axis rotations
-    camXRY = rotate_phi_z(ay, Y, X)
-    camYRY = rotate_phi_z(ay, Y, Y)
-    camZRY = rotate_phi_z(ay, Y, Z)
+    camXR = rotate_phi_z(angle, u, X)
+    camYR = rotate_phi_z(angle, u, Y)
+    camZR = rotate_phi_z(angle, u, Z)
 
-    camXRZ = rotate_phi_z(az, camZRY, camXRY)
-    camYRZ = rotate_phi_z(az, camZRY, camYRY)
-    camZRZ = rotate_phi_z(az, camZRY, camZRY)
+    camX2d = to_2d(camXR)
+    camY2d = to_2d(camYR)
+    camZ2d = to_2d(camZR)
 
-    camX2d = to_2d(camXRZ)
-    camY2d = to_2d(camYRZ)
-    camZ2d = to_2d(camZRZ)
+    # n = hcat(camXR,camYR,camZR)
+    # println(det(n))
 
     #Setting up variables we will need for calculations
-    Ry = [cosd(ay) 0 sind(ay);0 1 0;-sind(ay) 0 cosd(ay)]
-    Rz = [cosd(az) -sind(az) 0; sind(az) cosd(az) 0;0 0 1]
-    C = Rz * Ry
+    C = hcat(camXR, camYR, camZR)
     D = hcat(C, cam)
     B = vcat(D, [0 0 0 1])
     Binv = B^-1
 
-    # for i=1:s1
-    #     println(to_2d(focal_camera_points_in_space(B, focus, to_2d(focal_camera(Binv, focus, A[i,:])))[1:3,1]))
-    #     println()
-    #     println(focal_camera(Binv, focus, A[i,:]))
-    # end
-
-    # ----------------------------------------------------------- EXERCISE 3.1
-    for i=1:s1
-        circle(ctx, 375 + focal_camera(Binv, focus, A[i,:])[1]*100, 200 + focal_camera(Binv, focus, A[i,:])[2]*100, 1)
-        set_source_rgb(ctx, 1, 0, 0)
-        fill(ctx)
+    for i=1:4
+        println(B[i,:])
     end
 
-    # ----------------------------------------------------------- EXERCISE 3.2
+
+    a = [0.9115;1.9397;3.3304]
+    b = [3.7207;2.8794;4.4372]
+    c = [1.9659;1.0000;3.2588]
+    d = [2.6663;3.8191;4.5087]
+
+    a2d = to_2d(a)
+    b2d = to_2d(b)
+    c2d = to_2d(c)
+    d2d = to_2d(d)
+
+    # --------------------------------------------------------------- EXERCISE 4.3 / 4.5
+    camera_plane_without_focus(Binv, a)
+    camera_plane_without_focus(Binv, b)
+    camera_plane_without_focus(Binv, c)
+    camera_plane_without_focus(Binv, d)
+
+    println("Point a in the camera plane (Homogeneous): ", camera_plane_without_focus(Binv, a))
+    println("Point b in the camera plane (Homogeneous): ", camera_plane_without_focus(Binv, b))
+    println("Point c in the camera plane (Homogeneous): ", camera_plane_without_focus(Binv, c))
+    println("Point d in the camera plane (Homogeneous): ", camera_plane_without_focus(Binv, d))
+
+    # DRAW POINTS a, b, c, d AND ITS SEGMENTS
+    # a BLUE
+    circle(ctx, 1000 + camera_plane_without_focus(Binv, a)[1]*100, 300 - camera_plane_without_focus(Binv, a)[2]*100, 3)
+    set_source_rgb(ctx, 0, 0, 1)
+    fill(ctx)
+
+    # b RED
+    circle(ctx, 1000 + camera_plane_without_focus(Binv, b)[1]*100, 300 - camera_plane_without_focus(Binv, b)[2]*100, 3)
+    set_source_rgb(ctx, 1, 0, 0)
+    fill(ctx)
+
+    # c PURPLE
+    circle(ctx, 1000 + camera_plane_without_focus(Binv, c)[1]*100, 300 - camera_plane_without_focus(Binv, c)[2]*100, 3)
+    set_source_rgb(ctx, 1, 0, 1)
+    fill(ctx)
+
+    # d BLUE
+    circle(ctx, 1000 + camera_plane_without_focus(Binv, d)[1]*100, 300 - camera_plane_without_focus(Binv, d)[2]*100, 3)
+    set_source_rgb(ctx, 0, 1, 0)
+    fill(ctx)
+
+    # DRAW SEGMENTS
+    # ab
+    set_line_width(ctx, 1)
+    set_source_rgb(ctx, 0, 0, 0)
+    move_to(ctx, 1000 +  camera_plane_without_focus(Binv, a)[1]*100, 300 -  camera_plane_without_focus(Binv, a)[2]*100)
+    line_to(ctx, 1000 + camera_plane_without_focus(Binv, b)[1]*100, 300 - camera_plane_without_focus(Binv, b)[2]*100)
+    stroke(ctx)
+
+    # cd
+    set_line_width(ctx, 1)
+    set_source_rgb(ctx, 0, 0, 0)
+    move_to(ctx, 1000 +  camera_plane_without_focus(Binv, c)[1]*100, 300 -  camera_plane_without_focus(Binv, c)[2]*100)
+    line_to(ctx, 1000 + camera_plane_without_focus(Binv, d)[1]*100, 300 - camera_plane_without_focus(Binv, d)[2]*100)
+    stroke(ctx)
+
+    # --------------------------------------------------------------- EXERCISE 4.4
     # DRAW CANON BASIS
     #DRAW X AXIS CANON (RED)
     set_line_width(ctx, 2)
@@ -199,21 +238,6 @@ function draw_the_canvas(canvas)
     circle(ctx, originX + Z2[1]*100, originY - Z2[2]*100, 5)
     set_source_rgb(ctx, 0, 0, 1)
     fill(ctx)
-
-    # DRAW CIRCLE POINTS IN SPACE
-    for i=1:s1
-        circle(ctx, originX + to_2d(A[i,:])[1]*100, originY - to_2d(A[i,:])[2]*100, 2)
-        set_source_rgb(ctx, 0, 0, 1)
-        fill(ctx)
-    end
-
-    # DRAW FOCAL CAMERA POINTS IN SPACE
-    for i=1:s1
-        circle(ctx, originX + to_2d(focal_camera_points_in_space(B, focus, focal_camera(Binv, focus, A[i,:])[1:2,:])[1:3,:])[1]*100,
-         originY - to_2d(focal_camera_points_in_space(B, focus, focal_camera(Binv, focus, A[i,:])[1:2,:])[1:3,:])[2]*100, 1)
-        set_source_rgb(ctx, 1, 0, 0)
-        fill(ctx)
-    end
 
     # WE DRAW THE AXIS' CAMERA
     #DRAW X AXIS CAMERA (RED)
@@ -252,14 +276,66 @@ function draw_the_canvas(canvas)
     set_source_rgb(ctx, 0, 0, 1)
     fill(ctx)
 
-    # LINES FORM EACH CIRCLE POINT TO ORIGIN CAMERA
-    for i=1:s1
-        set_line_width(ctx, 0.2)
-        set_source_rgb(ctx, 0, 0.5, 1)
-        move_to(ctx, originX + camCoord2d[1], originY - camCoord2d[2])
-        line_to(ctx, originX + to_2d(A[i,:])[1]*100, originY - to_2d(A[i,:])[2]*100)
-        stroke(ctx)
-    end
+    # DRAW POINTS a, b, c, d AND ITS SEGMENTS
+    # a BLUE
+    circle(ctx, originX + a2d[1]*100, originY - a2d[2]*100, 3)
+    set_source_rgb(ctx, 0, 0, 1)
+    fill(ctx)
+
+    # b RED
+    circle(ctx, originX + b2d[1]*100, originY - b2d[2]*100, 3)
+    set_source_rgb(ctx, 1, 0, 0)
+    fill(ctx)
+
+    # c PURPLE
+    circle(ctx, originX + c2d[1]*100, originY - c2d[2]*100, 3)
+    set_source_rgb(ctx, 1, 0, 1)
+    fill(ctx)
+
+    # d BLUE
+    circle(ctx, originX + d2d[1]*100, originY - d2d[2]*100, 3)
+    set_source_rgb(ctx, 0, 1, 0)
+    fill(ctx)
+
+    # DRAW SEGMENTS
+    # ab
+    set_line_width(ctx, 1)
+    set_source_rgb(ctx, 0, 0, 0)
+    move_to(ctx, originX +  a2d[1]*100, originY -  a2d[2]*100)
+    line_to(ctx, originX + b2d[1]*100, originY - b2d[2]*100)
+    stroke(ctx)
+
+    # cd
+    set_line_width(ctx, 1)
+    set_source_rgb(ctx, 0, 0, 0)
+    move_to(ctx, originX +  c2d[1]*100, originY -  c2d[2]*100)
+    line_to(ctx, originX + d2d[1]*100, originY - d2d[2]*100)
+    stroke(ctx)
+
+    # LINES FORM EACH POINT TO ORIGIN CAMERA
+    set_line_width(ctx, 0.2)
+    set_source_rgb(ctx, 0, 0.5, 1)
+    move_to(ctx, originX + camCoord2d[1], originY - camCoord2d[2])
+    line_to(ctx, originX + a2d[1]*100, originY - a2d[2]*100)
+    stroke(ctx)
+
+    set_line_width(ctx, 0.2)
+    set_source_rgb(ctx, 0, 0.5, 1)
+    move_to(ctx, originX + camCoord2d[1], originY - camCoord2d[2])
+    line_to(ctx, originX + b2d[1]*100, originY - b2d[2]*100)
+    stroke(ctx)
+
+    set_line_width(ctx, 0.2)
+    set_source_rgb(ctx, 0, 0.5, 1)
+    move_to(ctx, originX + camCoord2d[1], originY - camCoord2d[2])
+    line_to(ctx, originX + c2d[1]*100, originY - c2d[2]*100)
+    stroke(ctx)
+
+    set_line_width(ctx, 0.2)
+    set_source_rgb(ctx, 0, 0.5, 1)
+    move_to(ctx, originX + camCoord2d[1], originY - camCoord2d[2])
+    line_to(ctx, originX + d2d[1]*100, originY - d2d[2]*100)
+    stroke(ctx)
 
     stroke(ctx)
 
