@@ -139,6 +139,8 @@ function draw_the_canvas(canvas)
     B = vcat(D, [0 0 0 1])
     Binv = B^-1
 
+    focus = 1
+
     for i=1:4
         println(B[i,:])
     end
@@ -155,34 +157,34 @@ function draw_the_canvas(canvas)
     d2d = to_2d(d)
 
     # --------------------------------------------------------------- EXERCISE 4.3 / 4.5
-    camera_plane_without_focus(Binv, a)
-    camera_plane_without_focus(Binv, b)
-    camera_plane_without_focus(Binv, c)
-    camera_plane_without_focus(Binv, d)
+    focal_camera(Binv, focus, a)
+    focal_camera(Binv, focus, b)
+    focal_camera(Binv, focus, c)
+    focal_camera(Binv, focus, d)
 
-    println("Point a in the camera plane (Homogeneous): ", camera_plane_without_focus(Binv, a))
-    println("Point b in the camera plane (Homogeneous): ", camera_plane_without_focus(Binv, b))
-    println("Point c in the camera plane (Homogeneous): ", camera_plane_without_focus(Binv, c))
-    println("Point d in the camera plane (Homogeneous): ", camera_plane_without_focus(Binv, d))
+    println("Point a in the camera plane (Homogeneous): ", focal_camera(Binv, focus, a))
+    println("Point b in the camera plane (Homogeneous): ", focal_camera(Binv, focus, b))
+    println("Point c in the camera plane (Homogeneous): ", focal_camera(Binv, focus, c))
+    println("Point d in the camera plane (Homogeneous): ", focal_camera(Binv, focus, d))
 
     # DRAW POINTS a, b, c, d AND ITS SEGMENTS
     # a BLUE
-    circle(ctx, 1000 + camera_plane_without_focus(Binv, a)[1]*100, 300 - camera_plane_without_focus(Binv, a)[2]*100, 3)
+    circle(ctx, 1000 + focal_camera(Binv, focus, a)[1]*100, 300 - focal_camera(Binv, focus, a)[2]*100, 3)
     set_source_rgb(ctx, 0, 0, 1)
     fill(ctx)
 
     # b RED
-    circle(ctx, 1000 + camera_plane_without_focus(Binv, b)[1]*100, 300 - camera_plane_without_focus(Binv, b)[2]*100, 3)
+    circle(ctx, 1000 + focal_camera(Binv, focus, b)[1]*100, 300 - focal_camera(Binv, focus, b)[2]*100, 3)
     set_source_rgb(ctx, 1, 0, 0)
     fill(ctx)
 
     # c PURPLE
-    circle(ctx, 1000 + camera_plane_without_focus(Binv, c)[1]*100, 300 - camera_plane_without_focus(Binv, c)[2]*100, 3)
+    circle(ctx, 1000 + focal_camera(Binv, focus, c)[1]*100, 300 - focal_camera(Binv, focus, c)[2]*100, 3)
     set_source_rgb(ctx, 1, 0, 1)
     fill(ctx)
 
     # d BLUE
-    circle(ctx, 1000 + camera_plane_without_focus(Binv, d)[1]*100, 300 - camera_plane_without_focus(Binv, d)[2]*100, 3)
+    circle(ctx, 1000 + focal_camera(Binv, focus, d)[1]*100, 300 - focal_camera(Binv, focus, d)[2]*100, 3)
     set_source_rgb(ctx, 0, 1, 0)
     fill(ctx)
 
@@ -190,15 +192,15 @@ function draw_the_canvas(canvas)
     # ab
     set_line_width(ctx, 1)
     set_source_rgb(ctx, 0, 0, 0)
-    move_to(ctx, 1000 +  camera_plane_without_focus(Binv, a)[1]*100, 300 -  camera_plane_without_focus(Binv, a)[2]*100)
-    line_to(ctx, 1000 + camera_plane_without_focus(Binv, b)[1]*100, 300 - camera_plane_without_focus(Binv, b)[2]*100)
+    move_to(ctx, 1000 + focal_camera(Binv, focus, a)[1]*100, 300 -  focal_camera(Binv, focus, a)[2]*100)
+    line_to(ctx, 1000 + focal_camera(Binv, focus, b)[1]*100, 300 - focal_camera(Binv, focus, b)[2]*100)
     stroke(ctx)
 
     # cd
     set_line_width(ctx, 1)
     set_source_rgb(ctx, 0, 0, 0)
-    move_to(ctx, 1000 +  camera_plane_without_focus(Binv, c)[1]*100, 300 -  camera_plane_without_focus(Binv, c)[2]*100)
-    line_to(ctx, 1000 + camera_plane_without_focus(Binv, d)[1]*100, 300 - camera_plane_without_focus(Binv, d)[2]*100)
+    move_to(ctx, 1000 + focal_camera(Binv, focus, c)[1]*100, 300 - focal_camera(Binv, focus, c)[2]*100)
+    line_to(ctx, 1000 + focal_camera(Binv, focus, d)[1]*100, 300 - focal_camera(Binv, focus, d)[2]*100)
     stroke(ctx)
 
     # --------------------------------------------------------------- EXERCISE 4.4

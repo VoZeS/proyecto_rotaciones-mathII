@@ -93,13 +93,13 @@ function focal_camera_points_in_space(cameraMatrix, focus, point2d)
     return point_in_space
 end
 
-# FUNCTION TO KNOW THE CAMERA PLANE WITHOUT FOCUS (EX 4.3)
-function camera_plane_without_focus(cameraMatrixInv, point)
-    pointHomo = vcat(point, [1])
-
-    finalPoint=cameraMatrixInv*pointHomo
-
-    finalPointHomo = [finalPoint[1]/finalPoint[3];finalPoint[2]/finalPoint[3]; finalPoint[3]/finalPoint[3]]
-
-    return finalPointHomo
-    end
+# # FUNCTION TO KNOW THE CAMERA PLANE WITHOUT FOCUS (EX 4.3)
+# function camera_plane_without_focus(cameraMatrixInv, point)
+#     pointHomo = vcat(point, [1])
+#
+#     finalPoint=cameraMatrixInv*pointHomo
+#
+#     finalPointHomo = [finalPoint[1]/finalPoint[3];finalPoint[2]/finalPoint[3]; finalPoint[3]/finalPoint[3]]
+#
+#     return finalPointHomo
+#     end
